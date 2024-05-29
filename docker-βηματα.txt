@@ -1,0 +1,38 @@
+Η διαδικασία που ακολουθήσαμε για το Dockerfile και το Docker Compose . 
+Αρχικά , εγκαταστήσαμε το Docker στον υπολογιστή μας . Έπειτα , δημιουργήσαμε ενα αρχείο με το ονομα Dockerfile στον κατάλογο του R Shiny app μας . Το Dockerfile έχει το εξής περιεχόμενο :
+# Χρησιμοποίηση της επίσημης εικόνας του R
+FROM r-base:latest
+
+# Εγκατάσταση των πακετων
+RUN R -e "install.packages(c('shiny', 'rpart', 'ggplot2', 'dplyr', 'cluster'), repos='https://cran.rstudio.com/')"
+
+
+# Αντιγραφή του R Shiny app στον container
+COPY TLapp.R /srv/shiny-server/
+
+# Ορισμός του φακέλου εργασίας
+WORKDIR /srv/shiny-server/
+
+# Εκκίνηση του Shiny server
+CMD ["R", "-e", "shiny::runApp('TLapp.R', host='0.0.0.0', port=3838)"]
+
+
+Στην συνέχεια δημιουργήσαμε το αρχείο docker-compose.yml στον ίδιο κατάλογο :
+
+version: '3.8'
+
+services:
+  shiny-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3838:3838"
+
+
+Τέλος, ανοίξαμε ενα τερματικό σε αυτο τον κατάλογο που περιέχει ολα τα αρχεία και εκτελέσαμε την εντολή :
+docker-compose up
+
+( Επίσης, χρειάστηκε να ανοίξουμε την πορτα 3838 στο firewall )
+
+link της εφαρμογης μας : http://192.168.1.15:3838 
