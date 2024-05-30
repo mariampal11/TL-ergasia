@@ -1,9 +1,10 @@
 version: '3.8'
 
 services:
-  shiny-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  shiny_app:
+    build: .
     ports:
       - "3838:3838"
+    volumes:
+      - .:/srv/shiny-server
+    restart: always
